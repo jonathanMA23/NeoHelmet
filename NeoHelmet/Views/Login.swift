@@ -1,15 +1,8 @@
-//
-//  Login.swift
-//  NeoHelmet
-//
-//  Created by Jonathan Mendoza Acevedo on 27/11/25.
-//
-
 import SwiftUI
-import FirebaseAuth
-import FirebaseAnalytics
 import Combine
-import FirebaseFirestore
+import FirebaseAuth
+
+
 
 // MARK: - Vista de Login Estilo NeoHelmet
 struct LoginView: View {
