@@ -21,6 +21,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct NeoHelmetApp: App {
+    
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([

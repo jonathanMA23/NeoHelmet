@@ -1,6 +1,8 @@
 import SwiftUI
 import Combine // Importante para corregir el error de ObservableObject
 import FirebaseAuth // Esto solo funcionará si completaste el Paso 2 arriba
+import FirebaseCore
+
 
 // MARK: - Extensiones de Diseño
 extension Color {
@@ -8,6 +10,8 @@ extension Color {
     static let neonGreen = Color(red: 0.6, green: 1.0, blue: 0.0) // Verde lima intenso
     static let darkField = Color(red: 0.1, green: 0.1, blue: 0.1) // Gris muy oscuro para inputs
 }
+
+
 
 // MARK: - ViewModel de Autenticación
 class AuthViewModel: ObservableObject {

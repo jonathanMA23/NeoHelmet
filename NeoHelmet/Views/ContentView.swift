@@ -53,7 +53,7 @@ struct ContentView: View {
                 .tag(3)
             
             // Pestaña 5: Perfil
-            Text("Perfil Usuario")
+             PerfilView()
                 .tabItem {
                     Label("Perfil", systemImage: "person.fill")
                 }
