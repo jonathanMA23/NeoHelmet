@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DF37943D2ED9642A0017BA12 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DF37943C2ED9642A0017BA12 /* FirebaseAnalytics */; };
+		DF37943F2ED9642A0017BA12 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = DF37943E2ED9642A0017BA12 /* FirebaseAuth */; };
+		DF3794412ED9642A0017BA12 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = DF3794402ED9642A0017BA12 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		DF37941F2ED95CD60017BA12 /* NeoHelmet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NeoHelmet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +29,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF37943D2ED9642A0017BA12 /* FirebaseAnalytics in Frameworks */,
+				DF37943F2ED9642A0017BA12 /* FirebaseAuth in Frameworks */,
+				DF3794412ED9642A0017BA12 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +74,9 @@
 			);
 			name = NeoHelmet;
 			packageProductDependencies = (
+				DF37943C2ED9642A0017BA12 /* FirebaseAnalytics */,
+				DF37943E2ED9642A0017BA12 /* FirebaseAuth */,
+				DF3794402ED9642A0017BA12 /* FirebaseFirestore */,
 			);
 			productName = NeoHelmet;
 			productReference = DF37941F2ED95CD60017BA12 /* NeoHelmet.app */;
@@ -94,6 +106,9 @@
 			);
 			mainGroup = DF3794162ED95CD60017BA12;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DF3794392ED960F50017BA12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DF3794202ED95CD60017BA12 /* Products */;
 			projectDirPath = "";
@@ -351,6 +366,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DF3794392ED960F50017BA12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DF37943C2ED9642A0017BA12 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF3794392ED960F50017BA12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		DF37943E2ED9642A0017BA12 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF3794392ED960F50017BA12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		DF3794402ED9642A0017BA12 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF3794392ED960F50017BA12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DF3794172ED95CD60017BA12 /* Project object */;
 }

@@ -6,216 +6,222 @@
 //
 
 import SwiftUI
-// Descomenta la siguiente línea una vez hayas instalado el SDK de Firebase en tu proyecto
-// import FirebaseAuth
+import FirebaseAuth
+import FirebaseAnalytics
+import Combine
+import FirebaseFirestore
 
-// MARK: - ViewModel de Autenticación
-// Maneja la lógica de negocio y comunicación con Firebase
-class AuthViewModel: ObservableObject {
-    @Published var email = ""
-    @Published var password = ""
-    @Published var errorMessage = ""
-    @Published var isLoading = false
-    @Published var isAuthenticated = false // Úsalo para navegar a la siguiente pantalla
-    
-    // Función de Login
-    func login() {
-        validate()
-        isLoading = true
-        
-        // Simulación de retraso de red (Reemplazar con código real de Firebase abajo)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.isLoading = false
-            // Si fuera real: Auth.auth().signIn(withEmail: email, password: password) { ... }
-            self.isAuthenticated = true // Simulamos éxito
-        }
-        
-        /* CÓDIGO REAL FIREBASE:
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                if let error = error {
-                    self?.errorMessage = error.localizedDescription
-                } else {
-                    self?.isAuthenticated = true
-                }
-            }
-        }
-        */
-    }
-    
-    // Función de Registro
-    func register() {
-        validate()
-        isLoading = true
-        
-        // Simulación
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.isLoading = false
-            self.isAuthenticated = true
-        }
-        
-        /* CÓDIGO REAL FIREBASE:
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                if let error = error {
-                    self?.errorMessage = error.localizedDescription
-                } else {
-                    self?.isAuthenticated = true
-                }
-            }
-        }
-        */
-    }
-    
-    private func validate() {
-        errorMessage = ""
-        guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Por favor llena todos los campos"
-            return
-        }
-    }
-}
-
-// MARK: - Vista de Login
+// MARK: - Vista de Login Estilo NeoHelmet
 struct LoginView: View {
     @StateObject private var viewModel = AuthViewModel()
-    @State private var isLoginMode = true // Alternar entre Login y Registro
+    @State private var isLoginMode = true
+    
+    // Controlamos qué campo está activo para pintar el borde verde
+    @FocusState private var focusedField: Field?
+    enum Field {
+        case email, password
+    }
     
     var body: some View {
         ZStack {
-            // Fondo con degradado animado
-            LinearGradient(
-                gradient: Gradient(colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.9)]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .edgesIgnoringSafeArea(.all)
+            // 1. Fondo Negro Puro
+            Color.black.edgesIgnoringSafeArea(.all)
             
-            VStack(spacing: 20) {
-                // Logo o Título
-                VStack {
-                    Image(systemName: "swift")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
-                        .foregroundColor(.white)
-                        .padding(.bottom, 10)
+            VStack {
+                Spacer()
+                
+                // 2. Logo y Título Neon
+                VStack(spacing: 15) {
+                    ZStack {
+                        // Resplandor verde detrás del logo
+                        Circle()
+                            .fill(Color.neonGreen.opacity(0.2))
+                            .frame(width: 80, height: 80)
+                            .blur(radius: 20)
+                        
+                        Image(systemName: "shield") // Icono de escudo
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 60, height: 60)
+                            .foregroundColor(.neonGreen)
+                            .font(.system(size: 60, weight: .light))
+                            .overlay(
+                                // Línea de "escaneo" en el escudo
+                                Rectangle()
+                                    .frame(height: 2)
+                                    .foregroundColor(.neonGreen)
+                                    .offset(y: -5)
+                            )
+                    }
                     
-                    Text(isLoginMode ? "Bienvenido" : "Crear Cuenta")
+                    Text("NeoHelmet")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
+                    
+                    Text("Seguridad vial inteligente")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
                 }
-                .padding(.top, 50)
-                .padding(.bottom, 30)
+                .padding(.bottom, 40)
                 
-                // Formulario
-                VStack(spacing: 15) {
-                    TextField("Correo Electrónico", text: $viewModel.email)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
+                // 3. Formulario Oscuro
+                VStack(spacing: 25) {
+                    // Campo Email
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Correo electrónico")
+                            .foregroundColor(.white)
+                            .font(.system(size: 14))
+                        
+                        HStack {
+                            Image(systemName: "envelope")
+                                .foregroundColor(.gray)
+                            TextField("tu@email.com", text: $viewModel.email)
+                                .keyboardType(.emailAddress)
+                                .autocapitalization(.none)
+                                .foregroundColor(.white)
+                                .focused($focusedField, equals: .email)
+                        }
                         .padding()
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(10)
-                        .foregroundColor(.white)
+                        .background(Color.darkField)
+                        .cornerRadius(12)
+                        // Borde verde neón si está seleccionado
                         .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(focusedField == .email ? Color.neonGreen : Color.clear, lineWidth: 1.5)
                         )
+                    }
                     
-                    SecureField("Contraseña", text: $viewModel.password)
+                    // Campo Contraseña
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Contraseña")
+                            .foregroundColor(.white)
+                            .font(.system(size: 14))
+                        
+                        HStack {
+                            Image(systemName: "lock")
+                                .foregroundColor(.gray)
+                            SecureField("••••••••", text: $viewModel.password)
+                                .foregroundColor(.white)
+                                .focused($focusedField, equals: .password)
+                            
+                            // Botón "ojo" decorativo
+                            Image(systemName: "eye")
+                                .foregroundColor(.gray)
+                        }
                         .padding()
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(10)
-                        .foregroundColor(.white)
+                        .background(Color.darkField)
+                        .cornerRadius(12)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(focusedField == .password ? Color.neonGreen : Color.clear, lineWidth: 1.5)
                         )
+                    }
                     
+                    // Olvidaste contraseña
+                    HStack {
+                        Spacer()
+                        Button("¿Olvidaste tu contraseña?") {
+                            // Acción pendiente
+                        }
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                    }
+                    
+                    // Mensaje de Error
                     if !viewModel.errorMessage.isEmpty {
                         Text(viewModel.errorMessage)
                             .foregroundColor(.red)
                             .font(.caption)
-                            .padding(.top, 5)
-                            .background(Color.white.opacity(0.8))
-                            .cornerRadius(5)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .padding(.horizontal, 30)
-                
-                // Botón de Acción
-                Button(action: {
-                    if isLoginMode {
-                        viewModel.login()
-                    } else {
-                        viewModel.register()
-                    }
-                }) {
-                    ZStack {
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                        } else {
-                            Text(isLoginMode ? "Iniciar Sesión" : "Registrarse")
-                                .font(.headline)
-                                .foregroundColor(.blue)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(15)
-                    .shadow(radius: 5)
-                }
-                .padding(.horizontal, 30)
-                .padding(.top, 20)
-                .disabled(viewModel.isLoading)
-                
-                // Switcher Login/Registro
-                Button(action: {
-                    withAnimation {
-                        isLoginMode.toggle()
-                        viewModel.errorMessage = ""
-                    }
-                }) {
-                    Text(isLoginMode ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia Sesión")
-                        .foregroundColor(.white.opacity(0.9))
-                        .font(.subheadline)
-                }
-                .padding(.top, 10)
+                .padding(.horizontal, 24)
                 
                 Spacer()
+                
+                // 4. Botón de Acción Neon
+                VStack(spacing: 20) {
+                    Button(action: {
+                        if isLoginMode {
+                            viewModel.login()
+                        } else {
+                            viewModel.register()
+                        }
+                    }) {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                        } else {
+                            Text(isLoginMode ? "Iniciar sesión" : "Registrarse")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .foregroundColor(.black) // Texto negro sobre verde para contraste
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.neonGreen)
+                                .cornerRadius(12)
+                        }
+                    }
+                    .disabled(viewModel.isLoading)
+                    
+                    // Switcher Registro/Login
+                    HStack {
+                        Text(isLoginMode ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?")
+                            .foregroundColor(.gray)
+                        Button(action: {
+                            withAnimation {
+                                isLoginMode.toggle()
+                                viewModel.errorMessage = ""
+                            }
+                        }) {
+                            Text(isLoginMode ? "Regístrate" : "Inicia sesión")
+                                .fontWeight(.bold)
+                                .foregroundColor(.neonGreen)
+                        }
+                    }
+                    .font(.subheadline)
+                    .padding(.bottom, 10)
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 20)
             }
         }
-        // Navegación simulada al éxito
+        // Navegación principal a la App
         .fullScreenCover(isPresented: $viewModel.isAuthenticated) {
-            // Aquí iría tu ContentView (la vista de tarjetas)
-            SuccessPlaceholderView()
+            ContentView() // <--- CAMBIO AQUÍ: Ahora vamos a la app real
+        }
+        // Verificar si el usuario ya tiene sesión iniciada al abrir la app
+        .onAppear {
+            if Auth.auth().currentUser != nil {
+                viewModel.isAuthenticated = true
+            }
         }
     }
 }
 
-// MARK: - Placeholder para la navegación
-// En la Fase 2, reemplazaremos esto con la integración del ContentView de tarjetas
+// Vista temporal de éxito (YA NO SE USA, pero la dejo por si acaso)
 struct SuccessPlaceholderView: View {
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        VStack {
-            Text("¡Login Exitoso!")
-                .font(.largeTitle)
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
+            VStack {
+                Image(systemName: "checkmark.shield.fill")
+                    .font(.system(size: 80))
+                    .foregroundColor(Color.neonGreen)
+                Text("¡Acceso Concedido!")
+                    .font(.title)
+                    .bold()
+                    .foregroundColor(.white)
+                    .padding()
+                
+                Button("Cerrar Sesión") {
+                    presentationMode.wrappedValue.dismiss()
+                }
                 .padding()
-            
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 100))
-                .foregroundColor(.green)
-            
-            Button("Cerrar Sesión (Demo)") {
-                presentationMode.wrappedValue.dismiss()
+                .foregroundColor(.gray)
             }
-            .padding()
         }
     }
 }
@@ -223,5 +229,6 @@ struct SuccessPlaceholderView: View {
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView()
+            .preferredColorScheme(.dark)
     }
 }
